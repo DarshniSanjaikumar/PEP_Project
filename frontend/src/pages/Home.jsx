@@ -1,7 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronDown, Play, ArrowRight, Star, Moon, Cloud } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import Loader from '../components/Loader';
 
 const Home = () => {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate loading or wait for real data
+    const timer = setTimeout(() => setLoading(false), 2000);
+    return () => clearTimeout(timer);
+  }, []);
+  
   const [scrollY, setScrollY] = useState(0);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
@@ -36,6 +47,7 @@ const Home = () => {
     { id: 5, icon: Moon, size: 18, delay: 4000, duration: 5000 },
     { id: 6, icon: Cloud, size: 22, delay: 5000, duration: 6500 },
   ];
+  if (loading) return <Loader page="your DreamScape"/>;
 
   return (
     <div className="min-h-screen bg-black text-white flex items-center justify-center p-6 ">
@@ -109,7 +121,7 @@ const Home = () => {
           }}
         >
           <div 
-            className="bg-white/5 backdrop-blur-sm rounded-lg p-3 border border-white/10 hover:border-purple-400/30 transition-all duration-500 hover:shadow-lg hover:shadow-purple-500/10 animate-float"
+            className="bg-transparent backdrop-blur-sm rounded-lg p-3 transition-all duration-500 hover:shadow-lg hover:shadow-purple-500/10 animate-float"
             style={{
               animationDelay: '0ms',
               animationDuration: '4000ms'
@@ -141,7 +153,7 @@ const Home = () => {
           }}
         >
           <div 
-            className="bg-white/5 backdrop-blur-sm rounded-lg p-3 border border-white/10 hover:border-blue-400/30 transition-all duration-500 hover:shadow-lg hover:shadow-blue-500/10 animate-float"
+            className="bg-transparent backdrop-blur-sm rounded-lg p-3 transition-all duration-500 hover:shadow-lg hover:shadow-blue-500/10 animate-float"
             style={{
               animationDelay: '500ms',
               animationDuration: '4500ms'
@@ -173,7 +185,7 @@ const Home = () => {
           }}
         >
           <div 
-            className="bg-white/5 backdrop-blur-sm rounded-lg p-3 border border-white/10 hover:border-cyan-400/30 transition-all duration-500 hover:shadow-lg hover:shadow-cyan-500/10 animate-float"
+            className="bg-transparent backdrop-blur-sm rounded-lg p-3 transition-all duration-500 hover:shadow-lg hover:shadow-cyan-500/10 animate-float"
             style={{
               animationDelay: '1000ms',
               animationDuration: '3800ms'
@@ -205,7 +217,7 @@ const Home = () => {
           }}
         >
           <div 
-            className="bg-white/5 backdrop-blur-sm rounded-lg p-3 border border-white/10 hover:border-red-400/30 transition-all duration-500 hover:shadow-lg hover:shadow-red-500/10 animate-float"
+            className="bg-transparent backdrop-blur-sm rounded-lg p-3 transition-all duration-500 hover:shadow-lg hover:shadow-red-500/10 animate-float"
             style={{
               animationDelay: '1500ms',
               animationDuration: '4200ms'
@@ -250,13 +262,13 @@ const Home = () => {
               transform: `translateY(${scrollY * -0.02}px)`,
             }}
           >
-            <button className="group flex items-center space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 hover:bg-white/20 transition-all duration-300 border border-white/20 hover:border-purple-400/50 hover:shadow-lg hover:shadow-purple-500/20">
+            {/* <button className="group flex items-center space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 hover:bg-white/20 transition-all duration-300 border border-white/20 hover:border-purple-400/50 hover:shadow-lg hover:shadow-purple-500/20">
               <div className="w-6 h-6 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center animate-pulse">
                 <span className="text-black font-bold text-xs">D</span>
               </div>
               <span className="text-white">Unlock Your Dreams</span>
               <ArrowRight size={16} className="text-white group-hover:translate-x-1 transition-transform duration-300" />
-            </button>
+            </button> */}
           </div>
 
           {/* Main Heading */}
@@ -289,11 +301,11 @@ const Home = () => {
               transform: `translateY(${scrollY * 0.01}px)`,
             }}
           >
-            <button className="group flex items-center space-x-2 bg-white text-black px-6 py-3 rounded-full hover:bg-gray-200 transition-all duration-300 font-medium hover:shadow-lg hover:shadow-white/20 hover:scale-105">
-              <span>Open Journal</span>
+            <button className="group flex items-center space-x-2 bg-white text-black px-6 py-3 rounded-full hover:bg-gray-200 transition-all duration-300 font-medium hover:shadow-lg hover:shadow-white/20 hover:scale-105" onClick={()=>{navigate("/journal")}}>
+              <span>Unlock Your Dreams</span>
               <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform duration-300" />
             </button>
-            <button className="bg-white/10 backdrop-blur-sm text-white px-6 py-3 rounded-full hover:bg-white/20 transition-all duration-300 border border-white/20 hover:border-purple-400/50 hover:shadow-lg hover:shadow-purple-500/20 hover:scale-105">
+            <button className="bg-white/10 backdrop-blur-sm text-white px-6 py-3 rounded-full hover:bg-white/20 transition-all duration-300 border border-white/20 hover:border-purple-400/50 hover:shadow-lg hover:shadow-purple-500/20 hover:scale-105" onClick={()=>{navigate('/about')}}>
               Discover More
             </button>
           </div>

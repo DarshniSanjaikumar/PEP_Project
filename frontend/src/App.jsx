@@ -8,6 +8,9 @@ import Insights from './pages/Insights';
 import About from './pages/About';
 import Signup from './pages/Signup';
 import Login from './pages/Login';
+import ResetPassword from './pages/ResetPassword';
+import ForgotPasswordPage from './pages/ForgotPassword';
+import NotFound from './pages/NotFount';
 function App() {
   return (
     <>
@@ -20,7 +23,9 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
-
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
     </>

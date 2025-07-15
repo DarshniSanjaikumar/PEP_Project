@@ -2,7 +2,15 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 import { sendEmail } from '../utils/sendEmail.js';
-import crypto from 'crypto';
+import nodemailer from "nodemailer";
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL,
+    pass: process.env.EMAIL_PASS,
+  },
+});
 
 export const signup = async (req, res) => {
   const { email, password, username } = req.body;
@@ -22,24 +30,62 @@ export const signup = async (req, res) => {
   }
 };
 
+// authController.js (Express example)
+export const getProfile = (req, res) => {
+  try {
+    const { user_name } = req.cookies; // HttpOnly cookie
+    if (!user_name) return res.status(401).json({ message: "Unauthorized" });
+    res.json({ userName: user_name });
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import User from '../models/User.js';
+
 export const login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ message: "User not found" });
+    const existingUser = await User.findOne({ email });
+    if (!existingUser)
+      return res.status(404).json({ message: 'User not found' });
 
-    const match = await bcrypt.compare(password, user.password);
-    if (!match) return res.status(400).json({ message: "Invalid credentials" });
+    const isPasswordCorrect = await bcrypt.compare(password, existingUser.password);
+    if (!isPasswordCorrect)
+      return res.status(401).json({ message: 'Invalid credentials' });
 
-    const token = jwt.sign({ userId: user._id }, "secretDreamscape", { expiresIn: '3d' });
-    res.status(200).json({ token, user: { id: user._id, email: user.email, username: user.username } });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Login failed" });
+    // Create JWT token
+    const token = jwt.sign(
+      { id: existingUser._id, email: existingUser.email },
+      process.env.JWT_SECRET,
+      { expiresIn: '1d' }
+    );
+
+    // Set cookie
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: false, // Only true on HTTPS
+      maxAge: 3600000
+    });
+
+    res.status(200).json({
+      message: 'Login successful',
+      user: {
+        id: existingUser._id,
+        email: existingUser.email,
+        username: existingUser.username
+      }
+    });
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ message: 'Server error' });
   }
-
 };
+
 
 export const verifyEmail = async (req, res) => {
   const { email, code } = req.body;

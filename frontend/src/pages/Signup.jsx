@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, Mail, Shield, User, Lock, ArrowRight, Star, Moon, Cloud, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import Loader from '../components/Loader';
+
+const API_BASE_URL = "http://localhost:5001";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -17,6 +20,12 @@ const Signup = () => {
   const [scrollY, setScrollY] = useState(0);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [message, setMessage] = useState('');
+  const [load, setIsLoad] = useState(true);
+   useEffect(() => {
+    // Simulate loading or wait for real data
+    const timer = setTimeout(() => setIsLoad(false), 2000);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
@@ -109,8 +118,7 @@ const Signup = () => {
     setMessage('');
 
     try {
-      // Simulate axios call - replace with actual axios import and call
-      const response = await fetch('http://localhost:5001/api/auth/signup', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -143,8 +151,7 @@ const Signup = () => {
     setMessage('');
 
     try {
-      // Simulate axios call - replace with actual axios import and call
-      const response = await fetch('http://localhost:5001/api/auth/verify', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/verify`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -174,42 +181,57 @@ const Signup = () => {
   };
 
   const handleRegister = async () => {
-    if (!validateStep()) return;
+  if (!validateStep()) return;
 
-    setIsLoading(true);
-    setMessage('');
+  setIsLoading(true);
+  setMessage('');
 
-    try {
-      // Simulate axios call - replace with actual axios import and call
-      const response = await fetch('http://localhost:5001/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: formData.email,
-          username: formData.username,
-          password: formData.password,
-        }),
-      });
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: formData.email,
+        username: formData.username,
+        password: formData.password,
+      }),
+      credentials: 'include', // Added for session handling
+    });
 
-      const data = await response.json();
+    const data = await response.json();
 
-      if (response.ok) {
-        setMessage(data.message || 'Registration completed successfully!');
-        setCurrentStep(4);
+    if (response.ok) {
+      setMessage(data.message || 'Registration completed successfully!');
+      
+      // ✅ Auto-login after successful registration
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+        
+        // ✅ Dispatch custom event to update Navbar login state
+        window.dispatchEvent(new Event('loginStatusChanged'));
+        
+        // Show success message briefly then redirect
+        setTimeout(() => {
+          navigate('/');
+        }, 1500);
       } else {
-        setMessage(data.message || 'Registration failed');
-        setErrors({ username: data.message || 'Registration failed' });
+        // If no token returned, just show success step
+        setCurrentStep(4);
       }
-    } catch (error) {
-      const errorMessage = error.response?.data?.message || 'Registration failed';
-      setMessage(errorMessage);
-      setErrors({ username: errorMessage });
+    } else {
+      setMessage(data.message || 'Registration failed');
+      setErrors({ username: data.message || 'Registration failed' });
     }
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || 'Registration failed';
+    setMessage(errorMessage);
+    setErrors({ username: errorMessage });
+  }
 
-    setIsLoading(false);
-  };
+  setIsLoading(false);
+};
 
   const handleNext = () => {
     switch (currentStep) {
@@ -238,7 +260,7 @@ const Signup = () => {
     setMessage('');
 
     try {
-      const response = await fetch('http://localhost:5001/api/auth/signup', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -261,14 +283,10 @@ const Signup = () => {
   };
 
   const handleRedirectToHome = () => {
-    console.log('Redirecting to home page...');
     navigate('/');
-    // Add your navigation logic here
   };
 
   const handleSignIn = () => {
-    console.log('Redirecting to sign in...');
-    // Add your navigation logic here
     navigate('/login');
   };
 
@@ -423,6 +441,8 @@ const Signup = () => {
     }
   };
 
+  if (load) return <Loader page="Signup"/>;
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-purple-900 text-white flex items-center justify-center p-6">
       {/* Background Effects */}

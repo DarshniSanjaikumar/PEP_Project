@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState, useEffect }from "react";
 import { Sparkles, Brain, Heart, Rocket } from "lucide-react";
-
+import Loader from "../components/Loader";
 // Simple celestial background component
 const CelestialBackground = () => (
   <div className="absolute inset-0 overflow-hidden">
@@ -40,6 +40,18 @@ const aboutCards = [
 ];
 
 const About = () => {
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate loading or wait for real data
+    const timer = setTimeout(() => setLoading(false), 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) return <Loader page="About"/>;
+
+
   return (
     <div className="relative min-h-screen overflow-hidden py-20 px-6 flex items-center justify-center bg-black">
       <CelestialBackground />
@@ -60,7 +72,9 @@ const About = () => {
               className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 text-white shadow-2xl hover:shadow-purple-400/20 transition-all duration-300 transform hover:scale-[1.02] hover:bg-white/10"
             >
               <div className="mb-4">{card.icon}</div>
-              <h2 className="text-xl font-semibold text-gray-100 mb-2">{card.title}</h2>
+              <h2 className="text-xl font-semibold text-gray-100 mb-2">
+                {card.title}
+              </h2>
               <p className="text-gray-400 text-sm">{card.description}</p>
             </div>
           ))}
